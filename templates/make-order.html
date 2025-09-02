@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Заказать звонок</title>
+    <script src="https://telegram.org/js/telegram-web-app.js?59"></script>
+    <style>
+        /* === Reset & Box Sizing === */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* === Цвета Telegram + Liquid Glass === */
+        :root {
+            --tg-blue: #229ED9;
+            --tg-blue-light: #6dd3f5;
+            --white: #ffffff;
+            --text-dark: #1a1a1a;
+            --text-light: #f0f0f0;
+            --radius: 20px;
+            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #e6f8ff 0%, #ffffff 50%, #d9f0ff 100%);
+            color: var(--text-dark);
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        body.dark {
+            background: linear-gradient(135deg, #001e2b 0%, #000c1a 50%, #001524 100%);
+            color: var(--text-light);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* === Liquid Glass Card === */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border-radius: var(--radius);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
+            0 0 10px rgba(34, 158, 217, 0.2);
+            padding: 32px 24px;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), transparent);
+            border-radius: var(--radius);
+            pointer-events: none;
+        }
+
+        body.dark .glass-card {
+            background: rgba(10, 25, 40, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+            0 0 15px rgba(34, 158, 217, 0.25);
+        }
+
+        body.dark .glass-card::before {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), transparent);
+        }
+
+        h1 {
+            margin: 0 0 16px;
+            font-size: 1.7rem;
+            font-weight: 600;
+            color: var(--tg-blue);
+            letter-spacing: -0.5px;
+        }
+
+        p {
+            margin: 0 0 24px;
+            font-size: 0.95rem;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        body.dark p {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* === Иконка телефона (SVG) === */
+        .icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(34, 158, 217, 0.15);
+            border-radius: 50%;
+        }
+
+        .icon svg {
+            width: 50%;
+            height: 50%;
+            fill: var(--tg-blue);
+        }
+
+        /* === Кнопка === */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 999px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(140deg, var(--tg-blue-light), var(--tg-blue));
+            color: white;
+            box-shadow: 0 6px 20px rgba(34, 158, 217, 0.4),
+            inset 0 1px 2px rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: var(--transition);
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(34, 158, 217, 0.5),
+            inset 0 2px 4px rgba(255, 255, 255, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* === Поля формы === */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .input-field input,
+        .input-field textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 16px;
+            border: 1px solid rgba(34, 158, 217, 0.3);
+            outline: none;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--text-dark);
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark .input-field input,
+        body.dark .input-field textarea {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-field input:focus,
+        .input-field textarea:focus {
+            border-color: var(--tg-blue);
+            box-shadow: 0 0 0 2px rgba(34, 158, 217, 0.3);
+        }
+
+        .input-field input::placeholder,
+        .input-field textarea::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        body.dark .input-field input::placeholder,
+        body.dark .input-field textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        #error {
+            min-height: 20px;
+            color: #ff5e5e;
+            font-size: 0.875rem;
+            text-align: left;
+            margin: 4px 0;
+        }
+
+        @media (max-width: 480px) {
+            .glass-card {
+                padding: 28px 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                padding: 14px;
+                font-size: 0.95rem;
+            }
+        }
+
+        .icon img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto 24px;
+
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Основной экран -->
+    <div id="main" class="glass-card">
+        <div class="icon">
+            <img src="make_order.png" alt="make_order"
+                 style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; display: block;"/>
+        </div>
+        <h1>Заказать звонок</h1>
+        <p>Заполните форму — наш специалист свяжется с вами в удобное время</p>
+        <button class="btn" id="click">Заказать звонок</button>
+    </div>
+
+    <!-- Форма -->
+    <div id="form" class="glass-card" style="display: none;">
+        <h1>Заполните форму</h1>
+        <form>
+            <input type="hidden" id="form_type" value="application"/>
+            <div class="input-field">
+                <input type="text" id="user_name" placeholder="Ваше имя" required/>
+            </div>
+            <div class="input-field">
+                <input type="tel" id="user_phone" placeholder="+7 (999) 888-77-66" required/>
+            </div>
+            <div class="input-field">
+                <textarea id="user_problem" rows="3" placeholder="Опишите проблему" required></textarea>
+            </div>
+            <div id="error"></div>
+            <button type="button" class="btn" id="order">Отправить</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    // Переключение темы
+    if (tg.colorScheme === 'dark') {
+        document.body.classList.add('dark');
+    }
+
+    // Переключение экранов
+    document.getElementById('click').addEventListener('click', () => {
+        document.getElementById('main').style.display = 'none';
+        document.getElementById('form').style.display = 'block';
+    });
+
+    // Маска телефона
+    const phoneInput = document.getElementById('user_phone');
+    phoneInput.addEventListener('input', () => {
+        let value = phoneInput.value.replace(/\D/g, '');
+        if (!value.startsWith('7') && value.length > 0) value = '7' + value;
+        if (value.length > 11) value = value.slice(0, 11);
+
+        let formatted = '+';
+        if (value.length > 0) formatted += value[0];
+        if (value.length > 1) formatted += ' (' + value.slice(1, 4);
+        if (value.length > 4) formatted += ') ' + value.slice(4, 7);
+        if (value.length > 7) formatted += '-' + value.slice(7, 9);
+        if (value.length > 9) formatted += '-' + value.slice(9);
+
+        phoneInput.value = formatted;
+    });
+
+    // Отправка формы
+    document.getElementById('order').addEventListener('click', () => {
+        const name = document.getElementById('user_name').value.trim();
+        const phone = phoneInput.value.replace(/\D/g, '');
+        const problem = document.getElementById('user_problem').value.trim();
+        const form_type = document.getElementById('form_type').value;
+        const errorBlock = document.getElementById('error');
+
+        errorBlock.innerText = '';
+
+        if (name.length < 2) {
+            errorBlock.innerText = 'Введите корректное имя';
+            return;
+        }
+        if (!/^7\d{10}$/.test(phone)) {
+            errorBlock.innerText = 'Введите номер в формате +7 (999) 888-77-66';
+            return;
+        }
+        if (problem.length < 2) {
+            errorBlock.innerText = 'Опишите проблему';
+            return;
+        }
+
+        const formData = {
+            form: form_type,
+            name,
+            phone: '+7' + phone.slice(1),
+            topic: problem
+        };
+
+        tg.sendData(JSON.stringify(formData));
+        tg.close();
+    });
+</script>
+</body>
+</html>
