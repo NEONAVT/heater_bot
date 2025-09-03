@@ -7,7 +7,7 @@
 
 
 from handlers.private_handlers.prices_handler import router as prices_router
-from handlers.private_handlers.start_hendler import router as start_router
+from handlers.private_handlers.start_handler import router as start_router
 from handlers.private_handlers.about import router as about_router
 from handlers.private_handlers.web_app_data_handler import router as web_app_data_router
 from handlers.private_handlers.installation_handler import router as services_router

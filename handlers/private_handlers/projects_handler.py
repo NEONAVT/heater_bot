@@ -4,7 +4,7 @@ from aiogram import Router, F
 from aiogram.enums import ParseMode
 from aiogram.types import Message, InputMediaPhoto, FSInputFile
 from bot_config import bot
-from handlers.private_handlers.start_hendler import StartHandler
+from handlers.private_handlers.start_handler import StartHandler
 from keyboards import projects_kb
 
 logger = logging.getLogger(__name__)
