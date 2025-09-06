@@ -35,7 +35,3 @@ ifeq ($(OS),Windows_NT)
 else
 	@xdg-open docs_html/index.html || open docs_html/index.html
 endif
-
-test: ## Run tests with pytest
-	@echo "Running tests..."
-	pytest tests -v --maxfail=1 --disable-warnings

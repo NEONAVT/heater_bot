@@ -6,7 +6,7 @@
 """
 
 
-from handlers.group_handlers.start_hendler import router as group_start_handler
+from handlers.group_handlers.start_handler import router as group_start_handler
 from handlers.group_handlers.remind_handler import router as remind_router
 from handlers.group_handlers.db_export import router as db_export_users_router
 
