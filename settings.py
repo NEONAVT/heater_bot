@@ -1,10 +1,13 @@
 import os
 from pathlib import Path
 
+from pydantic import ConfigDict
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    model_config = ConfigDict(env_file=".env")
+
     bot_token: str
     admin_chat_id: str
     base_dir: Path = os.path.dirname(os.path.dirname(__file__))
@@ -37,8 +40,6 @@ class Settings(BaseSettings):
         return (f"https://api.telegram.org/bot{self.bot_token}/"
                 f"sendMessage?chat_id={self.admin_chat_id}&text={text}")
 
-    class Config:
-        env_file = ".env"
 
 
 settings = Settings()
